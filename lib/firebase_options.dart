@@ -63,4 +63,13 @@ class DefaultFirebaseOptions {
     storageBucket: 'reddit-clone-86a22.appspot.com',
   );
 
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyABgUlxraI-TpWq4V8M5ZYB97AYD8ucMqw',
+    appId: '1:185605974647:ios:23b0afb32effa676c43472',
+    messagingSenderId: '185605974647',
+    projectId: 'reddit-clone-86a22',
+    storageBucket: 'reddit-clone-86a22.appspot.com',
+    iosClientId: '185605974647-r3qe6fu1hreij22tg3987bt3epre12df.apps.googleusercontent.com',
+    iosBundleId: 'com.mayeavx.redditClione',
+  );
 }
