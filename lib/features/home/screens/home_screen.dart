@@ -5,7 +5,6 @@ import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/home/delegates/search_community_delegate.dart';
 import 'package:reddit_clione/features/home/drawers/community_list_drawer.dart';
 import 'package:reddit_clione/features/home/drawers/profile_drawer.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../../../models/user_model.dart';
 
@@ -62,6 +61,8 @@ class HomeScreen extends ConsumerWidget {
       endDrawer: const ProfileDrawer(),
       bottomNavigationBar: CupertinoTabBar(items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home)),
+        BottomNavigationBarItem(icon: Icon(Icons.add)),
+
       ]),
     );
   }
