@@ -1,17 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reddit_clione/core/constants/constants.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/home/delegates/search_community_delegate.dart';
 import 'package:reddit_clione/features/home/drawers/community_list_drawer.dart';
 import 'package:reddit_clione/features/home/drawers/profile_drawer.dart';
+import 'package:reddit_clione/theme/palette.dart';
 
 import '../../../models/user_model.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({
     Key? key,
   }) : super(key: key);
+
+  @override
+  ConsumerState<ConsumerStatefulWidget> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  int _page = 0;
+
+  void onPageChanged(int page) {
+    setState(() {
+      _page = page;
+    });
+  }
 
   void displayDrawer(BuildContext context) {
     Scaffold.of(context).openDrawer();
@@ -22,7 +37,8 @@ class HomeScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    ThemeData theme = ref.watch(themeNotifierProvider);
     final UserModel user = ref.read(userProvider)!;
 
     return Scaffold(
@@ -57,13 +73,19 @@ class HomeScreen extends ConsumerWidget {
           }),
         ],
       ),
+      body: Constants.tabScreens[_page],
       drawer: const CommunityListDrawer(),
       endDrawer: const ProfileDrawer(),
-      bottomNavigationBar: CupertinoTabBar(items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home)),
-        BottomNavigationBarItem(icon: Icon(Icons.add)),
-
-      ]),
+      bottomNavigationBar: CupertinoTabBar(
+        backgroundColor: theme.backgroundColor,
+        activeColor: theme.iconTheme.color,
+        onTap: onPageChanged,
+        currentIndex: _page,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), tooltip: 'Home feed'),
+          BottomNavigationBarItem(icon: Icon(Icons.add), tooltip: 'Add a post'),
+        ],
+      ),
     );
   }
 }

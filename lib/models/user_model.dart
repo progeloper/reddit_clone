@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_this
+
 class UserModel{
   final String name;
   final String profilePic;

@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:reddit_clione/core/failure.dart';
 import 'package:reddit_clione/core/providers/storage_repository_provider.dart';
-import 'package:reddit_clione/core/type_defs.dart';
 import 'package:reddit_clione/core/utils.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/community/repository/community_repository.dart';

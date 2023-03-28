@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+// ignore_for_file: unnecessary_this
+
 
 class CommunityModel{
   final String id;

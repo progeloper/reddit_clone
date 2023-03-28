@@ -72,7 +72,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       setState(() {
         avatarFile = File(result.files.first.path!);
       });
-      ;
     }
   }
 
@@ -167,7 +166,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),

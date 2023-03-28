@@ -4,7 +4,6 @@ import 'package:reddit_clione/core/common/error_text.dart';
 import 'package:reddit_clione/core/common/loader.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/community/controller/community_controller.dart';
-import 'package:reddit_clione/models/community_model.dart';
 
 class AddModScreen extends ConsumerStatefulWidget {
   final String name;

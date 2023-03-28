@@ -5,7 +5,6 @@ import 'package:reddit_clione/core/common/loader.dart';
 import 'package:reddit_clione/features/community/controller/community_controller.dart';
 import 'package:routemaster/routemaster.dart';
 
-import '../../../models/community_model.dart';
 
 class SearchCommunityDelegate extends SearchDelegate {
   final WidgetRef ref;

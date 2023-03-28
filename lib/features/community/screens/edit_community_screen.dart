@@ -48,7 +48,6 @@ class _EditCommunityScreenState extends ConsumerState<EditCommunityScreen> {
       setState(() {
         avatarFile = File(result.files.first.path!);
       });
-      ;
     }
   }
 

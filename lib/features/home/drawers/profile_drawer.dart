@@ -33,7 +33,7 @@ class ProfileDrawer extends ConsumerWidget {
             : Column(
                 children: [
                   CircleAvatar(
-                    backgroundImage: NetworkImage(user!.profilePic),
+                    backgroundImage: NetworkImage(user.profilePic),
                     radius: 70,
                   ),
                   const SizedBox(height: 10),
