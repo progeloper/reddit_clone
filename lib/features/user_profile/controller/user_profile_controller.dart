@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reddit_clione/models/post_model.dart';
 import 'package:reddit_clione/models/user_model.dart';
 import '../../../core/providers/storage_repository_provider.dart';
 import '../../../core/utils.dart';
@@ -13,6 +14,10 @@ final userProfileControllerProvider = StateNotifierProvider<UserProfileControlle
   return UserProfileController(repository, storageRepository);
 });
 
+final getUserPostsProvider = StreamProvider.family((ref, String uid) {
+  final controller = ref.read(userProfileControllerProvider.notifier);
+  return controller.fetchUserPosts(uid);
+});
 
 class UserProfileController extends StateNotifier<bool> {
   final UserProfileRepository _repository;
@@ -45,5 +50,9 @@ class UserProfileController extends StateNotifier<bool> {
     final result = await _repository.editUser(user);
     result.fold((l) => showSnackBar(context, l.message),
         (r) => showSnackBar(context, 'Changes will take effect next time you log in'));
+  }
+
+  Stream<List<PostModel>> fetchUserPosts(String uid){
+    return _repository.fetchUserPosts(uid);
   }
 }

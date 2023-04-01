@@ -1,12 +1,11 @@
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_clione/core/providers/storage_repository_provider.dart';
-import 'package:reddit_clione/core/type_defs.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/posts/repository/post_repository.dart';
+import 'package:reddit_clione/models/comment_model.dart';
 import 'package:reddit_clione/models/community_model.dart';
 import 'package:reddit_clione/models/post_model.dart';
 import 'package:routemaster/routemaster.dart';
@@ -27,6 +26,16 @@ final fetchUserFeedProvider =
     StreamProvider.family((ref, List<CommunityModel> communities) {
   final controller = ref.read(postControllerProvider.notifier);
   return controller.fetchUserFeed(communities);
+});
+
+final getPostByIdProvider = StreamProvider.family((ref, String id) {
+  final controller = ref.read(postControllerProvider.notifier);
+  return controller.getPostFromId(id);
+});
+
+final fetchCommentsProvider = StreamProvider.family((ref, String postId){
+  final controller = ref.read(postControllerProvider.notifier);
+  return controller.fetchPostComments(postId);
 });
 
 class PostController extends StateNotifier<bool> {
@@ -153,6 +162,10 @@ class PostController extends StateNotifier<bool> {
     return Stream.value([]);
   }
 
+  Stream<List<CommentModel>> fetchPostComments(String postId){
+    return _repository.fetchPostComments(postId);
+  }
+
   void upvotePost(
       BuildContext context, String upvoterId, PostModel post) async {
     final res = await _repository.upvotePost(upvoterId, post);
@@ -163,5 +176,42 @@ class PostController extends StateNotifier<bool> {
       BuildContext context, String downvoterId, PostModel post) async {
     final res = await _repository.downvotePost(downvoterId, post);
     res.fold((l) => showSnackBar(context, 'An error occurred'), (r) => null);
+  }
+
+  void addComment(
+      {required BuildContext context,
+      required String text,
+      required UserModel user,
+      required String postId}) async {
+    String id = const Uuid().v1();
+    final CommentModel comment = CommentModel(
+      comment: text,
+      id: id,
+      createdAt: DateTime.now(),
+      uid: user.uid,
+      avatar: user.profilePic,
+      upvotes: [],
+      downvotes: [],
+      username: user.name,
+      postId: postId,
+    );
+    final res = await _repository.addComment(postId, comment);
+    res.fold((l) => showSnackBar(context, 'An error occurred'), (r) => null);
+  }
+
+  void upvoteComment(
+      BuildContext context, String upvoterId, CommentModel comment) async {
+    final res = await _repository.upvoteComment(upvoterId, comment);
+    res.fold((l) => showSnackBar(context, 'An error occurred'), (r) => null);
+  }
+
+  void downvoteComment(
+      BuildContext context, String upvoterId, CommentModel comment ) async {
+    final res = await _repository.downvoteComment(upvoterId, comment);
+    res.fold((l) => showSnackBar(context, 'An error occurred'), (r) => null);
+  }
+
+  Stream<PostModel> getPostFromId(String id) {
+    return _repository.getPostById(id);
   }
 }

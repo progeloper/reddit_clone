@@ -17,7 +17,6 @@ class FeedScreen extends ConsumerWidget {
         data: (communities) {
           return ref.watch(fetchUserFeedProvider(communities)).when(
               data: (posts) {
-                print('hello');
                 return ListView.builder(
                     itemCount: posts.length,
                     itemBuilder: (context, index) {
@@ -33,7 +32,9 @@ class FeedScreen extends ConsumerWidget {
               },
               loading: () => const Loader());
         },
-        error: (error, stackTrace) => ErrorText(error: error.toString()),
+        error: (error, stackTrace) {
+          return ErrorText(error: error.toString());
+        },
         loading: () => const Loader());
   }
 }

@@ -5,6 +5,7 @@ import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/posts/controller/post_controller.dart';
 import 'package:reddit_clione/models/post_model.dart';
 import 'package:reddit_clione/theme/palette.dart';
+import 'package:routemaster/routemaster.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;
@@ -20,14 +21,30 @@ class PostCard extends ConsumerWidget {
         .deletePost(context, post, user!.uid);
   }
 
-  void upvote(WidgetRef ref, BuildContext context){
+  void upvote(WidgetRef ref, BuildContext context) {
     final user = ref.read(userProvider);
-    ref.read(postControllerProvider.notifier).upvotePost(context, user!.uid, post);
+    ref
+        .read(postControllerProvider.notifier)
+        .upvotePost(context, user!.uid, post);
   }
 
-  void downvote(WidgetRef ref, BuildContext context){
+  void downvote(WidgetRef ref, BuildContext context) {
     final user = ref.read(userProvider);
-    ref.read(postControllerProvider.notifier).downvotePost(context, user!.uid, post);
+    ref
+        .read(postControllerProvider.notifier)
+        .downvotePost(context, user!.uid, post);
+  }
+
+  void navigateToUserProfile(String uid, BuildContext context) {
+    Routemaster.of(context).push('/u/$uid');
+  }
+
+  void navigateToCommunityProfile(String name, BuildContext context) {
+    Routemaster.of(context).push('/r/$name');
+  }
+
+  void navigateToCommentScreen(BuildContext context){
+    Routemaster.of(context).push('post/${post.id}/comments');
   }
 
   @override
@@ -36,6 +53,7 @@ class PostCard extends ConsumerWidget {
     final isTypeText = post.type == 'text';
     final isTypeLink = post.type == 'link';
     final theme = ref.watch(themeNotifierProvider);
+    final user = ref.read(userProvider);
 
     return Column(
       children: [
@@ -56,7 +74,7 @@ class PostCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         InkWell(
-                          onTap: () {},
+                          onTap: ()=>navigateToCommunityProfile(post.communityName, context),
                           child: CircleAvatar(
                             backgroundImage:
                                 NetworkImage(post.communityProfilePic),
@@ -70,18 +88,22 @@ class PostCard extends ConsumerWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('r/${post.communityName}'),
-                            Text.rich(
-                              TextSpan(
-                                style: TextStyle(
-                                  color: Colors.grey[600],
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: ()=>navigateToUserProfile(post.uid, context),
+                                  child: Text('u/${post.username}',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                      ),),
                                 ),
-                                text: 'u/${post.username}',
-                                children: [
-                                  TextSpan(
-                                      //TODO add timeago package
-                                      text: ' • 1h')
-                                ],
-                              ),
+                                Text(
+                                  ' • 1h',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                  ),
+                                )
+                              ],
                             ),
                           ],
                         ),
@@ -90,7 +112,7 @@ class PostCard extends ConsumerWidget {
                           child: Container(),
                         ),
                         IconButton(
-                          onPressed: ()=>deletePost(ref, context),
+                          onPressed: () => deletePost(ref, context),
                           icon: const Icon(Icons.delete_outline),
                         ),
                       ],
@@ -161,23 +183,33 @@ class PostCard extends ConsumerWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: ()=>upvote(ref, context),
-                          icon: Icon(
-                            Icons.arrow_upward,
-                            color: Colors.grey[600],
-                          ),
+                          onPressed: () => upvote(ref, context),
+                          icon: post.upvotes.contains(user!.uid)
+                              ? Icon(
+                                  Icons.arrow_upward,
+                                  color: Colors.orange[900],
+                                )
+                              : Icon(
+                                  Icons.arrow_upward,
+                                  color: Colors.grey[600],
+                                ),
                         ),
-                        Text(post.upvotes.length.toString()),
+                        Text((post.upvotes.length - post.downvotes.length).toString()),
                         IconButton(
-                          onPressed: ()=>downvote(ref, context),
-                          icon: Icon(
-                            Icons.arrow_downward,
-                            color: Colors.grey[600],
-                          ),
+                          onPressed: () => downvote(ref, context),
+                          icon: post.downvotes.contains(user.uid)
+                              ? Icon(
+                                  Icons.arrow_downward,
+                                  color: Colors.orange[900],
+                                )
+                              : Icon(
+                                  Icons.arrow_downward,
+                                  color: Colors.grey[600],
+                                ),
                         ),
                         Flexible(flex: 2, child: Container()),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: ()=>navigateToCommentScreen(context),
                           icon: const Icon(Icons.chat_bubble_outline),
                         ),
                         Text(post.commentCount.toString()),
