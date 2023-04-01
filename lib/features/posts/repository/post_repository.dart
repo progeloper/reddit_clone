@@ -25,6 +25,8 @@ class PostRepository {
   CollectionReference get _comments =>
       _firestore.collection(FirebaseConstants.commentsCollection);
 
+  CollectionReference get _users => _firestore.collection(FirebaseConstants.usersCollection);
+
   FutureVoid addPost(PostModel post) async {
     try {
       return right(_posts.doc(post.id).set(post.toMap()));
@@ -34,6 +36,7 @@ class PostRepository {
       return left(Failure(e.toString()));
     }
   }
+
 
   Stream<List<PostModel>> fetchUserFeed(List<CommunityModel> communities) {
     return _posts
@@ -64,6 +67,9 @@ class PostRepository {
 
   FutureVoid upvotePost(String upvoterId, PostModel post) async {
     try {
+      await _users.doc(post.uid).update({
+        'karma': FieldValue.increment(1),
+      });
       if (post.downvotes.contains(upvoterId)) {
         await _posts.doc(post.id).update({
           'downvotes': FieldValue.arrayRemove([upvoterId])
@@ -87,6 +93,9 @@ class PostRepository {
 
   FutureVoid downvotePost(String downvoterId, PostModel post) async {
     try {
+      await _users.doc(post.uid).update({
+        'karma': FieldValue.increment(-1),
+      });
       if (post.upvotes.contains(downvoterId)) {
         await _posts.doc(post.id).update({
           'upvotes': FieldValue.arrayRemove([downvoterId])
@@ -123,6 +132,9 @@ class PostRepository {
   FutureVoid upvoteComment(
       String upvoterId, CommentModel comment) async {
     try {
+      await _users.doc(comment.uid).update({
+        'karma': FieldValue.increment(1),
+      });
       if (comment.downvotes.contains(upvoterId)) {
         await _comments.doc(comment.id).update({
           'downvotes': FieldValue.arrayRemove([upvoterId])
@@ -147,6 +159,9 @@ class PostRepository {
   FutureVoid downvoteComment(
       String downvoterId, CommentModel comment) async {
     try {
+      await _users.doc(comment.uid).update({
+        'karma': FieldValue.increment(-1),
+      });
       if (comment.upvotes.contains(downvoterId)) {
         await _comments.doc(comment.id).update({
           'upvotes': FieldValue.arrayRemove([downvoterId])
