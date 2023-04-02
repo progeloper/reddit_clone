@@ -212,6 +212,11 @@ class PostController extends StateNotifier<bool> {
     res.fold((l) => showSnackBar(context, 'An error occurred'), (r) => null);
   }
 
+  void awardPost(BuildContext context, PostModel post, String senderId, String award)async{
+    final res = await _repository.awardPost(post, award, senderId);
+    res.fold((l) => showSnackBar(context, 'An error occurred'), (r)=>showSnackBar(context, 'Post awarded with $award'));
+  }
+
   Stream<PostModel> getPostFromId(String id) {
     return _repository.getPostById(id);
   }

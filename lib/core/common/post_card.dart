@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/posts/controller/post_controller.dart';
 import 'package:reddit_clione/models/post_model.dart';
+import 'package:reddit_clione/models/user_model.dart';
 import 'package:reddit_clione/theme/palette.dart';
 import 'package:routemaster/routemaster.dart';
 
@@ -16,25 +17,27 @@ class PostCard extends ConsumerWidget {
     Key? key,
   }) : super(key: key);
 
-  void deletePost(WidgetRef ref, BuildContext context) {
-    final user = ref.read(userProvider);
+  void deletePost(WidgetRef ref, BuildContext context, UserModel user) {
     ref
         .read(postControllerProvider.notifier)
-        .deletePost(context, post, user!.uid);
+        .deletePost(context, post, user.uid);
   }
 
-  void upvote(WidgetRef ref, BuildContext context) {
-    final user = ref.read(userProvider);
-    ref
-        .read(postControllerProvider.notifier)
-        .upvotePost(context, user!.uid, post);
+  void awardPost(BuildContext context, WidgetRef ref, String award, String senderId){
+    ref.read(postControllerProvider.notifier).awardPost(context, post, senderId, award);
+
   }
 
-  void downvote(WidgetRef ref, BuildContext context) {
-    final user = ref.read(userProvider);
+  void upvote(WidgetRef ref, BuildContext context, UserModel user) {
     ref
         .read(postControllerProvider.notifier)
-        .downvotePost(context, user!.uid, post);
+        .upvotePost(context, user.uid, post);
+  }
+
+  void downvote(WidgetRef ref, BuildContext context, UserModel user) {
+    ref
+        .read(postControllerProvider.notifier)
+        .downvotePost(context, user.uid, post);
   }
 
   void navigateToUserProfile(String uid, BuildContext context) {
@@ -117,12 +120,25 @@ class PostCard extends ConsumerWidget {
                           flex: 1,
                           child: Container(),
                         ),
-                        IconButton(
-                          onPressed: () => deletePost(ref, context),
-                          icon: const Icon(Icons.delete_outline),
-                        ),
+                        if(user!.uid == post.uid)
+                          IconButton(
+                            onPressed: () => deletePost(ref, context, user),
+                            icon: const Icon(Icons.delete_outline),
+                          ),
                       ],
                     ),
+                    if(post.awards.isNotEmpty)...[
+                      const SizedBox(
+                        height: 5,
+                      ),
+                      SizedBox(
+                        height: 25,
+                        child: ListView.builder(itemCount: post.awards.length,itemBuilder: (context, index){
+                          final award = post.awards[index];
+                          return Image.asset(Constants.awards[award]!);
+                        },),
+                      )
+                    ],
                     const SizedBox(
                       height: 10,
                     ),
@@ -189,8 +205,8 @@ class PostCard extends ConsumerWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () => upvote(ref, context),
-                          icon: post.upvotes.contains(user!.uid)
+                          onPressed: () => upvote(ref, context, user),
+                          icon: post.upvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_upward,
                                   color: Colors.orange[900],
@@ -203,7 +219,7 @@ class PostCard extends ConsumerWidget {
                         Text((post.upvotes.length - post.downvotes.length)
                             .toString()),
                         IconButton(
-                          onPressed: () => downvote(ref, context),
+                          onPressed: () => downvote(ref, context, user),
                           icon: post.downvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_downward,
@@ -237,10 +253,13 @@ class PostCard extends ConsumerWidget {
                                       return const Center(child: Text('Wow, such empty'),);
                                     }
                                       final award = user.awards[index];
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8),
-                                        child: Image.asset(
-                                            Constants.awards[award]!),
+                                      return GestureDetector(
+                                        onTap: ()=>awardPost(context, ref, award, user.uid),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8),
+                                          child: Image.asset(
+                                              Constants.awards[award]!),
+                                        ),
                                       );
                                     }),
                               ),

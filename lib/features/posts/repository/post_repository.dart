@@ -197,6 +197,24 @@ class PostRepository {
             .toList());
   }
 
+  FutureVoid awardPost(PostModel post, String award, String senderId)async{
+    try{
+      await _users.doc(senderId).update({
+        'awards': FieldValue.arrayRemove([award]),
+      });
+      await _posts.doc(post.id).update({
+        'awards': FieldValue.arrayUnion([award]),
+      });
+      return right(_users.doc(post.uid).update({
+        'awards': FieldValue.arrayUnion([award]),
+      }));
+    }on FirebaseException catch(e){
+      throw e.message!;
+    } catch(e){
+      return left(Failure(e.toString()));
+    }
+  }
+
   Stream<PostModel> getPostById(String id) {
     return _posts.doc(id).snapshots().map((event) => PostModel.fromMap(event.data() as Map<String, dynamic>));
   }
