@@ -7,6 +7,8 @@ import 'package:reddit_clione/models/post_model.dart';
 import 'package:reddit_clione/theme/palette.dart';
 import 'package:routemaster/routemaster.dart';
 
+import '../constants/constants.dart';
+
 class PostCard extends ConsumerWidget {
   final PostModel post;
   const PostCard({
@@ -43,7 +45,7 @@ class PostCard extends ConsumerWidget {
     Routemaster.of(context).push('/r/$name');
   }
 
-  void navigateToCommentScreen(BuildContext context){
+  void navigateToCommentScreen(BuildContext context) {
     Routemaster.of(context).push('post/${post.id}/comments');
   }
 
@@ -74,7 +76,8 @@ class PostCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         InkWell(
-                          onTap: ()=>navigateToCommunityProfile(post.communityName, context),
+                          onTap: () => navigateToCommunityProfile(
+                              post.communityName, context),
                           child: CircleAvatar(
                             backgroundImage:
                                 NetworkImage(post.communityProfilePic),
@@ -91,11 +94,14 @@ class PostCard extends ConsumerWidget {
                             Row(
                               children: [
                                 InkWell(
-                                  onTap: ()=>navigateToUserProfile(post.uid, context),
-                                  child: Text('u/${post.username}',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                      ),),
+                                  onTap: () =>
+                                      navigateToUserProfile(post.uid, context),
+                                  child: Text(
+                                    'u/${post.username}',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
                                 ),
                                 Text(
                                   ' • 1h',
@@ -194,7 +200,8 @@ class PostCard extends ConsumerWidget {
                                   color: Colors.grey[600],
                                 ),
                         ),
-                        Text((post.upvotes.length - post.downvotes.length).toString()),
+                        Text((post.upvotes.length - post.downvotes.length)
+                            .toString()),
                         IconButton(
                           onPressed: () => downvote(ref, context),
                           icon: post.downvotes.contains(user.uid)
@@ -209,14 +216,37 @@ class PostCard extends ConsumerWidget {
                         ),
                         Flexible(flex: 2, child: Container()),
                         IconButton(
-                          onPressed: ()=>navigateToCommentScreen(context),
+                          onPressed: () => navigateToCommentScreen(context),
                           icon: const Icon(Icons.chat_bubble_outline),
                         ),
                         Text(post.commentCount.toString()),
                         Flexible(flex: 2, child: Container()),
                         IconButton(
-                          onPressed: () {},
-                          icon: const Icon(Icons.share),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                    gridDelegate:
+                                        const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 4),
+                                    itemCount: user.awards.length,
+                                    itemBuilder: (context, index) {
+                                    if(user.awards.isEmpty){
+                                      return const Center(child: Text('Wow, such empty'),);
+                                    }
+                                      final award = user.awards[index];
+                                      return Padding(
+                                        padding: const EdgeInsets.all(8),
+                                        child: Image.asset(
+                                            Constants.awards[award]!),
+                                      );
+                                    }),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.card_giftcard_outlined),
                         ),
                         Flexible(flex: 1, child: Container())
                       ],

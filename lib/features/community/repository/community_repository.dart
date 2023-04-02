@@ -6,6 +6,7 @@ import 'package:reddit_clione/core/failure.dart';
 import 'package:reddit_clione/core/providers/firebase_providers.dart';
 import 'package:reddit_clione/core/type_defs.dart';
 import 'package:reddit_clione/models/community_model.dart';
+import 'package:reddit_clione/models/post_model.dart';
 
 final communityRepositoryProvider = Provider((ref) {
   final firestore = ref.read(firestoreProvider);
@@ -19,6 +20,9 @@ class CommunityRepository {
 
   CollectionReference get _communities =>
       _firestore.collection(FirebaseConstants.communitiesCollection);
+
+  CollectionReference get _posts =>
+      _firestore.collection(FirebaseConstants.postsCollection);
 
   FutureVoid createCommunity(CommunityModel community) async {
     try {
@@ -67,9 +71,7 @@ class CommunityRepository {
   FutureVoid addMods(String communityName, List<String> uids) async {
     try {
       return right(
-        _communities.doc(communityName).update({
-          'mods': uids
-        }),
+        _communities.doc(communityName).update({'mods': uids}),
       );
     } on FirebaseException catch (e) {
       throw e.message!;
@@ -121,5 +123,16 @@ class CommunityRepository {
       }
       return communities;
     });
+  }
+
+  Stream<List<PostModel>> getCommunityPosts(String name) {
+    return _posts
+        .where('communityName', isEqualTo: name)
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((event) => event.docs
+            .map(
+                (e) => PostModel.fromMap(e.data() as Map<String, dynamic>))
+            .toList());
   }
 }

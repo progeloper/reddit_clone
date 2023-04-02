@@ -7,6 +7,7 @@ import 'package:reddit_clione/core/providers/storage_repository_provider.dart';
 import 'package:reddit_clione/core/utils.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/community/repository/community_repository.dart';
+import 'package:reddit_clione/models/post_model.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:uuid/uuid.dart';
 
@@ -37,6 +38,11 @@ final searchCommunityProvider = StreamProvider.family((ref, String query){
   return communityController.searchCommunity(query);
 });
 
+
+final getCommunityPostsProvider = StreamProvider.family((ref, String name){
+  final controller = ref.read(communityControllerProvider.notifier);
+  return controller.getCommunityPosts(name);
+});
 
 class CommunityController extends StateNotifier<bool> {
   final CommunityRepository _communityRepository;
@@ -129,5 +135,9 @@ class CommunityController extends StateNotifier<bool> {
 
   Stream<List<CommunityModel>> searchCommunity(String query){
     return _communityRepository.searchCommunity(query);
+  }
+
+  Stream<List<PostModel>> getCommunityPosts(String name){
+    return _communityRepository.getCommunityPosts(name);
   }
 }

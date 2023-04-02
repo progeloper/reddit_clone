@@ -1,7 +1,7 @@
 import 'package:reddit_clione/features/feed/screens/feed_screen.dart';
 import 'package:reddit_clione/features/posts/screens/add_post_screen.dart';
 
-class Constants{
+class Constants {
   static const logoPath = 'assets/images/logo.png';
   static const loginEmotePath = 'assets/images/loginEmote.png';
   static const googlePath = 'assets/images/google.png';
@@ -26,4 +26,15 @@ class Constants{
     FeedScreen(),
     AddPostScreen(),
   ];
+
+  static const awards = {
+    'awesomeAnswer': 'assets/images/awards/awesomeanswer.png',
+    'gold': 'assets/images/awards/gold.png',
+    'helpful': 'assets/images/awards/helpful.png',
+    'platinum': 'assets/images/awards/platinum.png',
+    'plusOne': 'assets/images/awards/plusone.png',
+    'thankYou': 'assets/images/awards/thankyou.png',
+    'rocket': 'assets/images/awards/rocket.png',
+    'til': 'assets/images/awards/til.png',
+  };
 }

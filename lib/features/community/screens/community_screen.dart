@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit_clione/core/common/error_text.dart';
 import 'package:reddit_clione/core/common/loader.dart';
+import 'package:reddit_clione/core/common/post_card.dart';
 import 'package:reddit_clione/features/auth/controller/auth_controller.dart';
 import 'package:reddit_clione/features/community/controller/community_controller.dart';
 import 'package:reddit_clione/models/community_model.dart';
@@ -14,12 +15,15 @@ class CommunityScreen extends ConsumerWidget {
     required this.name,
   }) : super(key: key);
 
-  void navigateToModTools(BuildContext context, String communityName){
+  void navigateToModTools(BuildContext context, String communityName) {
     Routemaster.of(context).push('/mod-tools/$communityName');
   }
 
-  void joinCommunity(BuildContext context, WidgetRef ref, CommunityModel community){
-    ref.read(communityControllerProvider.notifier).joinCommunity(community, context);
+  void joinCommunity(
+      BuildContext context, WidgetRef ref, CommunityModel community) {
+    ref
+        .read(communityControllerProvider.notifier)
+        .joinCommunity(community, context);
   }
 
   @override
@@ -75,7 +79,8 @@ class CommunityScreen extends ConsumerWidget {
                               community.mods.contains(currentUser.uid)
                                   ? OutlinedButton(
                                       onPressed: () {
-                                        navigateToModTools(context, community.name);
+                                        navigateToModTools(
+                                            context, community.name);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(
@@ -89,7 +94,8 @@ class CommunityScreen extends ConsumerWidget {
                                     )
                                   : community.members.contains(currentUser.uid)
                                       ? OutlinedButton(
-                                          onPressed: ()=>joinCommunity(context, ref, community),
+                                          onPressed: () => joinCommunity(
+                                              context, ref, community),
                                           style: ElevatedButton.styleFrom(
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -101,7 +107,8 @@ class CommunityScreen extends ConsumerWidget {
                                           child: const Text('Joined'),
                                         )
                                       : OutlinedButton(
-                                          onPressed: () =>joinCommunity(context, ref, community),
+                                          onPressed: () => joinCommunity(
+                                              context, ref, community),
                                           style: ElevatedButton.styleFrom(
                                             shape: RoundedRectangleBorder(
                                               borderRadius:
@@ -118,14 +125,29 @@ class CommunityScreen extends ConsumerWidget {
                             padding: const EdgeInsets.only(top: 10),
                             child: Text('${community.members.length} members'),
                           ),
-                          const SizedBox(height: 10,),
-                          const Divider(thickness: 2,),
+                          const SizedBox(
+                            height: 10,
+                          ),
+                          const Divider(
+                            thickness: 2,
+                          ),
                         ]),
                       ),
                     ),
                   ];
                 },
-                body: const Text('Posts'),
+                body: ref.watch(getCommunityPostsProvider(name)).when(
+                    data: (posts) {
+                      return ListView.builder(
+                          itemCount: posts.length,
+                          itemBuilder: (context, index) {
+                            final post = posts[index];
+                            return PostCard(post: post);
+                          });
+                    },
+                    error: (error, stackTrace) =>
+                        const ErrorText(error: 'An error occurred'),
+                    loading: () => const Loader()),
               );
             },
             error: (error, stackTrace) => ErrorText(error: error.toString()),
