@@ -40,6 +40,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     ThemeData theme = ref.watch(themeNotifierProvider);
     final UserModel user = ref.read(userProvider)!;
+    final isGuest = !user.isAuthenticated;
 
     return Scaffold(
       appBar: AppBar(
@@ -75,8 +76,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       body: Constants.tabScreens[_page],
       drawer: const CommunityListDrawer(),
-      endDrawer: const ProfileDrawer(),
-      bottomNavigationBar: CupertinoTabBar(
+      endDrawer: isGuest? null : const ProfileDrawer(),
+      bottomNavigationBar: isGuest? null : CupertinoTabBar(
         backgroundColor: theme.backgroundColor,
         activeColor: theme.iconTheme.color,
         onTap: onPageChanged,

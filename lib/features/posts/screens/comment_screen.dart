@@ -58,6 +58,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
   @override
   Widget build(BuildContext context) {
     final user = ref.read(userProvider);
+    final isGuest = !user!.isAuthenticated;
 
     return Scaffold(
       endDrawer: const ProfileDrawer(),
@@ -82,7 +83,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                 displayEndDrawer(context);
               },
               icon: CircleAvatar(
-                backgroundImage: NetworkImage(user!.profilePic),
+                backgroundImage: NetworkImage(user.profilePic),
               ),
             );
           }),
@@ -96,7 +97,8 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Row(
+                  if(!isGuest)
+                    Row(
                     children: [
                       Expanded(
                         child: TextField(
@@ -110,7 +112,7 @@ class _CommentScreenState extends ConsumerState<CommentScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () => postComment(user!),
+                        onPressed: () => postComment(user),
                         child: Text('Post'),
                       ),
                     ],

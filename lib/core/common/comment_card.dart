@@ -5,6 +5,7 @@ import 'package:reddit_clione/features/posts/controller/post_controller.dart';
 import 'package:reddit_clione/models/comment_model.dart';
 import 'package:reddit_clione/theme/palette.dart';
 
+
 class CommentCard extends ConsumerWidget {
   final CommentModel comment;
   const CommentCard({
@@ -24,6 +25,7 @@ class CommentCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ThemeData theme = ref.watch(themeNotifierProvider);
     final user = ref.read(userProvider);
+    final isGuest = !user!.isAuthenticated;
     return Column(
       children: [
         Container(
@@ -69,8 +71,8 @@ class CommentCard extends ConsumerWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: ()=>upvote(ref, context, user.uid),
-                          icon: comment.upvotes.contains(user!.uid)
+                          onPressed: isGuest? (){} : ()=>upvote(ref, context, user.uid),
+                          icon: comment.upvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_upward,
                                   color: Colors.orange[900],
@@ -83,7 +85,7 @@ class CommentCard extends ConsumerWidget {
                         Text((comment.upvotes.length - comment.downvotes.length)
                             .toString()),
                         IconButton(
-                          onPressed: ()=> downvote(ref, context, user.uid),
+                          onPressed: isGuest? (){} : ()=> downvote(ref, context, user.uid),
                           icon: comment.downvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_downward,

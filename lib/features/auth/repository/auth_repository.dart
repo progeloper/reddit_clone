@@ -32,11 +32,12 @@ class AuthRepository {
         _firestore = firestore,
         _googleSignIn = googleSignIn;
 
-  CollectionReference get _users => _firestore.collection(FirebaseConstants.usersCollection);
+  CollectionReference get _users =>
+      _firestore.collection(FirebaseConstants.usersCollection);
 
   Stream<User?> get authStateChange => _auth.authStateChanges();
 
-  FutureEither<UserModel> signInWithGoogle() async {
+  FutureEither<UserModel> signInWithGoogle(bool isFromLogin) async {
     try {
       final GoogleSignInAccount? user = await _googleSignIn.signIn();
 
@@ -45,11 +46,19 @@ class AuthRepository {
         accessToken: googleAuth?.accessToken,
         idToken: googleAuth?.idToken,
       );
-      final UserCredential userCred = await _auth.signInWithCredential(cred);
+
+      UserCredential userCred;
+      if(isFromLogin){
+        userCred = await _auth.signInWithCredential(cred);
+      } else{
+        userCred = await _auth.currentUser!.linkWithCredential(cred);
+      }
+
+
 
       UserModel userModel;
 
-      if(userCred.additionalUserInfo!.isNewUser){
+      if (userCred.additionalUserInfo!.isNewUser) {
         userModel = UserModel(
             name: userCred.user!.displayName ?? 'No name',
             profilePic: userCred.user!.photoURL ?? Constants.avatarDefault,
@@ -57,27 +66,56 @@ class AuthRepository {
             uid: userCred.user!.uid,
             isAuthenticated: true,
             karma: 0,
-            awards: []);
+            awards: [
+              'awesomeAnswer',
+              'gold',
+              'helpful',
+              'platinum',
+              'plusOne',
+              'thankYou',
+              'rocket',
+              'til',
+            ]);
         await _users.doc(userModel.uid).set(userModel.toMap());
-      } else{
+      } else {
         userModel = await (getUserData(userCred.user!.uid)).first;
       }
       return right(userModel);
-    } on FirebaseException catch (e){
+    } on FirebaseException catch (e) {
       throw e.message!;
-    }
-    catch (e) {
+    } catch (e) {
       return left(Failure(e.toString()));
     }
   }
 
-  Stream<UserModel> getUserData(String uid){
-    return _users.doc(uid).snapshots().map((event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
+  FutureEither<UserModel> signInAsGuest() async {
+    try {
+      final userCred = await _auth.signInAnonymously();
+        UserModel userModel = UserModel(
+            name: 'Guest',
+            profilePic: Constants.avatarDefault,
+            banner: Constants.bannerDefault,
+            uid: userCred.user!.uid,
+            isAuthenticated: false,
+            karma: 0,
+            awards: []);
+        await _users.doc(userModel.uid).set(userModel.toMap());
+
+      return right(userModel);
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  Stream<UserModel> getUserData(String uid) {
+    return _users.doc(uid).snapshots().map(
+        (event) => UserModel.fromMap(event.data() as Map<String, dynamic>));
   }
 
   void logOut() async {
     await _googleSignIn.signOut();
     await _auth.signOut();
   }
-
 }

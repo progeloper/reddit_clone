@@ -6,20 +6,22 @@ import 'package:reddit_clione/theme/palette.dart';
 
 class SignInButton extends ConsumerWidget {
   final String label;
-  const SignInButton({Key? key, required this.label})
+  final bool isFromLogin;
+  const SignInButton({Key? key, required this.label, this.isFromLogin = true})
       : super(key: key);
 
-  void signinWithGoogle(WidgetRef ref, BuildContext context){
+  void signInWithGoogle(WidgetRef ref, BuildContext context){
     final authController = ref.read(authControllerProvider.notifier);
-    authController.signInWithGoogle(context);
+    authController.signInWithGoogle(context, isFromLogin);
   }
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(18.0),
       child: ElevatedButton.icon(
-        onPressed: () => signinWithGoogle(ref, context),
+        onPressed: () => signInWithGoogle(ref, context),
         icon: Image.asset(
           Constants.googlePath,
           width: 35,

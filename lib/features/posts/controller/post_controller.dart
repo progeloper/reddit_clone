@@ -28,6 +28,14 @@ final fetchUserFeedProvider =
   return controller.fetchUserFeed(communities);
 });
 
+final fetchGuestFeedProvider =
+StreamProvider((ref) {
+  final controller = ref.read(postControllerProvider.notifier);
+  return controller.fetchGuestFeed();
+});
+
+
+
 final getPostByIdProvider = StreamProvider.family((ref, String id) {
   final controller = ref.read(postControllerProvider.notifier);
   return controller.getPostFromId(id);
@@ -161,6 +169,10 @@ class PostController extends StateNotifier<bool> {
       return _repository.fetchUserFeed(communities);
     }
     return Stream.value([]);
+  }
+
+  Stream<List<PostModel>> fetchGuestFeed() {
+      return _repository.fetchGuestFeed();
   }
 
   Stream<List<CommentModel>> fetchPostComments(String postId){

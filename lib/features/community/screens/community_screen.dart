@@ -29,6 +29,7 @@ class CommunityScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.read(userProvider)!;
+    final isGuest = !currentUser.isAuthenticated;
 
     return Scaffold(
       body: ref.watch(namedCommunityProvider(name)).when(
@@ -76,7 +77,8 @@ class CommunityScreen extends ConsumerWidget {
                                   fontSize: 19,
                                 ),
                               ),
-                              community.mods.contains(currentUser.uid)
+                              isGuest? Container()
+                              : community.mods.contains(currentUser.uid)
                                   ? OutlinedButton(
                                       onPressed: () {
                                         navigateToModTools(

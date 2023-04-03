@@ -59,6 +59,7 @@ class PostCard extends ConsumerWidget {
     final isTypeLink = post.type == 'link';
     final theme = ref.watch(themeNotifierProvider);
     final user = ref.read(userProvider);
+    final isGuest = !user!.isAuthenticated;
 
     return Column(
       children: [
@@ -120,7 +121,7 @@ class PostCard extends ConsumerWidget {
                           flex: 1,
                           child: Container(),
                         ),
-                        if(user!.uid == post.uid)
+                        if(user.uid == post.uid)
                           IconButton(
                             onPressed: () => deletePost(ref, context, user),
                             icon: const Icon(Icons.delete_outline),
@@ -205,7 +206,7 @@ class PostCard extends ConsumerWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: () => upvote(ref, context, user),
+                          onPressed: isGuest? (){} : () => upvote(ref, context, user),
                           icon: post.upvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_upward,
@@ -219,7 +220,7 @@ class PostCard extends ConsumerWidget {
                         Text((post.upvotes.length - post.downvotes.length)
                             .toString()),
                         IconButton(
-                          onPressed: () => downvote(ref, context, user),
+                          onPressed: isGuest? (){} : () => downvote(ref, context, user),
                           icon: post.downvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_downward,
@@ -254,7 +255,7 @@ class PostCard extends ConsumerWidget {
                                     }
                                       final award = user.awards[index];
                                       return GestureDetector(
-                                        onTap: ()=>awardPost(context, ref, award, user.uid),
+                                        onTap: isGuest? (){} : ()=>awardPost(context, ref, award, user.uid),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8),
                                           child: Image.asset(
