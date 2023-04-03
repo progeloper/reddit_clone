@@ -31,7 +31,7 @@ class CommunityListDrawer extends ConsumerWidget {
       child: SafeArea(
         child: Column(
           children: <Widget>[
-            isGuest? const SignInButton(label: 'Sign in', isFromLogin: false,) : ListTile(
+            isGuest? const SignInButton(label: 'Sign in') : ListTile(
               leading: const Icon(Icons.add),
               title: const Text('Create a community'),
               onTap: () {

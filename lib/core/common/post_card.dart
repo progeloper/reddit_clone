@@ -23,9 +23,11 @@ class PostCard extends ConsumerWidget {
         .deletePost(context, post, user.uid);
   }
 
-  void awardPost(BuildContext context, WidgetRef ref, String award, String senderId){
-    ref.read(postControllerProvider.notifier).awardPost(context, post, senderId, award);
-
+  void awardPost(
+      BuildContext context, WidgetRef ref, String award, String senderId) {
+    ref
+        .read(postControllerProvider.notifier)
+        .awardPost(context, post, senderId, award);
   }
 
   void upvote(WidgetRef ref, BuildContext context, UserModel user) {
@@ -121,23 +123,30 @@ class PostCard extends ConsumerWidget {
                           flex: 1,
                           child: Container(),
                         ),
-                        if(user.uid == post.uid)
+                        if (user.uid == post.uid)
                           IconButton(
                             onPressed: () => deletePost(ref, context, user),
                             icon: const Icon(Icons.delete_outline),
                           ),
                       ],
                     ),
-                    if(post.awards.isNotEmpty)...[
+                    if (post.awards.isNotEmpty) ...[
                       const SizedBox(
                         height: 5,
                       ),
                       SizedBox(
                         height: 25,
-                        child: ListView.builder(itemCount: post.awards.length,itemBuilder: (context, index){
-                          final award = post.awards[index];
-                          return Image.asset(Constants.awards[award]!);
-                        },),
+                        width: double.infinity,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: post.awards.length,
+                          itemBuilder: (context, index) {
+                            final award = post.awards[index];
+                            return SizedBox(
+                                height: 25,
+                                child: Image.asset(Constants.awards[award]!));
+                          },
+                        ),
                       )
                     ],
                     const SizedBox(
@@ -206,7 +215,9 @@ class PostCard extends ConsumerWidget {
                     Row(
                       children: [
                         IconButton(
-                          onPressed: isGuest? (){} : () => upvote(ref, context, user),
+                          onPressed: isGuest
+                              ? () {}
+                              : () => upvote(ref, context, user),
                           icon: post.upvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_upward,
@@ -220,7 +231,9 @@ class PostCard extends ConsumerWidget {
                         Text((post.upvotes.length - post.downvotes.length)
                             .toString()),
                         IconButton(
-                          onPressed: isGuest? (){} : () => downvote(ref, context, user),
+                          onPressed: isGuest
+                              ? () {}
+                              : () => downvote(ref, context, user),
                           icon: post.downvotes.contains(user.uid)
                               ? Icon(
                                   Icons.arrow_downward,
@@ -244,18 +257,23 @@ class PostCard extends ConsumerWidget {
                               context: context,
                               builder: (context) => Dialog(
                                 child: GridView.builder(
-                                  shrinkWrap: true,
+                                    shrinkWrap: true,
                                     gridDelegate:
                                         const SliverGridDelegateWithFixedCrossAxisCount(
                                             crossAxisCount: 4),
                                     itemCount: user.awards.length,
                                     itemBuilder: (context, index) {
-                                    if(user.awards.isEmpty){
-                                      return const Center(child: Text('Wow, such empty'),);
-                                    }
+                                      if (user.awards.isEmpty) {
+                                        return const Center(
+                                          child: Text('Wow, such empty'),
+                                        );
+                                      }
                                       final award = user.awards[index];
                                       return GestureDetector(
-                                        onTap: isGuest? (){} : ()=>awardPost(context, ref, award, user.uid),
+                                        onTap: isGuest
+                                            ? () {}
+                                            : () => awardPost(
+                                                context, ref, award, user.uid),
                                         child: Padding(
                                           padding: const EdgeInsets.all(8),
                                           child: Image.asset(
